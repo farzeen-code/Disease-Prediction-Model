@@ -1,1 +1,19 @@
--e ".ipynb_checkpoints/\n__pycache__/\n*.pyc" 
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Python virtual environments
+disease_prediction_api/
+venv/
+.venv/
+env/
+
+# Python cache & compiled files
+__pycache__/
+*.pyc
+
+# IDE settings
+.vscode/
+.idea/
+
+# Environment variables & local secrets
+.env
