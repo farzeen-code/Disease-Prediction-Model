@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from typing import Literal
 from pydantic import BaseModel, Field
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 
 app = FastAPI(
     title = 'Disease Prediction API',
@@ -15,6 +16,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -43,8 +45,8 @@ class PredictionResponse(BaseModel):
     disease_probability: float
 
 @app.get('/')
-def health_check():
-    return {'status': 'ok', 'message': 'POST patient data to /predict to get a prediction.'}
+def read_root():
+    return FileResponse('index.html')
 
 @app.post('/predict', response_model=PredictionResponse)
 
