@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Disease Prediction — Risk Intake</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EDF2F4;
+    --card:#FFFFFF;
+    --ink:#10262E;
+    --ink-soft:#4C6169;
+    --border:#D7E1E4;
+    --monitor:#04211F;
+    --monitor-line:#0B3B37;
+    --pulse:#37E8B3;
+    --risk:#FF6B5E;
+    --focus:#1C5D66;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:1080px;
+    margin:0 auto;
+    padding:48px 24px 80px;
+  }
+  header{
+    margin-bottom:32px;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--focus);
+    margin:0 0 8px;
+  }
+  h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:clamp(28px,4vw,38px);
+    font-weight:700;
+    margin:0 0 8px;
+    letter-spacing:-0.01em;
+  }
+  .sub{
+    color:var(--ink-soft);
+    font-size:15px;
+    max-width:560px;
+    line-height:1.5;
+    margin:0;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns:1.15fr 1fr;
+    gap:24px;
+    margin-top:32px;
+    align-items:start;
+  }
+  @media (max-width:860px){
+    .grid{grid-template-columns:1fr;}
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:28px;
+  }
+  .card h2{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:16px;
+    font-weight:600;
+    margin:0 0 20px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .field-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px 14px;
+  }
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .field label{
+    font-size:12px;
+    font-weight:500;
+    color:var(--ink-soft);
+  }
+  .field .hint{
+    font-size:11px;
+    color:#8CA0A6;
+    margin-top:-2px;
+  }
+  input, select{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:14px;
+    padding:9px 10px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:#FBFCFC;
+    color:var(--ink);
+    outline:none;
+    width:100%;
+  }
+  input:focus, select:focus, button:focus-visible{
+    border-color:var(--focus);
+    box-shadow:0 0 0 3px rgba(28,93,102,0.18);
+  }
+  .submit-row{
+    margin-top:24px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  button{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:14px;
+    background:var(--ink);
+    color:#F2F6F6;
+    border:none;
+    border-radius:9px;
+    padding:12px 22px;
+    cursor:pointer;
+  }
+  button:hover{background:#0B1D24;}
+  button:disabled{opacity:0.5;cursor:not-allowed;}
+  .error{
+    font-size:13px;
+    color:var(--risk);
+    font-family:'IBM Plex Mono', monospace;
+  }
+  .monitor{
+    background:var(--monitor);
+    border-radius:14px;
+    padding:26px;
+    color:#DFF7F0;
+    position:sticky;
+    top:24px;
+  }
+  .monitor h2{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:#6FA79C;
+    margin:0 0 14px;
+    font-weight:500;
+  }
+  .trace{
+    width:100%;
+    height:120px;
+    display:block;
+  }
+  .readout{
+    margin-top:18px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+  }
+  .status-label{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:22px;
+    font-weight:700;
+  }
+  .status-label.healthy{color:var(--pulse);}
+  .status-label.disease{color:var(--risk);}
+  .status-label.idle{color:#3E625C;}
+  .prob{
+    font-family:'IBM Plex Mono', monospace;
+    text-align:right;
+  }
+  .prob .num{
+    font-size:28px;
+    font-weight:600;
+    display:block;
+    line-height:1;
+  }
+  .prob .cap{
+    font-size:10px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:#6FA79C;
+  }
+  .monitor-note{
+    margin-top:16px;
+    font-size:12px;
+    color:#5A8B81;
+    line-height:1.5;
+    border-top:1px solid var(--monitor-line);
+    padding-top:14px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Cleveland Heart Disease Model · Logistic Regression</p>
+    <h1>Patient risk intake</h1>
+    <p class="sub">Enter clinical measurements below. Predictions come from a model trained on the UCI Cleveland dataset — for portfolio demonstration, not medical use.</p>
+  </header>
+
+  <div class="grid">
+    <form class="card" id="predictionForm">
+      <h2>Measurements</h2>
+      <div class="field-grid" id="fieldGrid"></div>
+      <div class="submit-row">
+        <button type="submit" id="submitBtn">Run prediction</button>
+        <span class="error" id="errorMsg"></span>
+      </div>
+    </form>
+
+    <div class="monitor">
+      <h2>Readout</h2>
+      <svg className="trace" id="traceSvg" viewBox="0 0 400 120" preserveAspectRatio="none">
+        <line x1="0" y1="60" x2="400" y2="60" stroke="var(--monitor-line)" stroke-width="1" />
+        <path id="tracePath" d="M0,60 L400,60" fill="none" stroke="var(--pulse)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+      </svg>
+      <div class="readout">
+        <span class="status-label idle" id="statusLabel">Awaiting input</span>
+        <span class="prob">
+          <span class="num" id="probNum">—</span>
+          <span class="cap">disease probability</span>
+        </span>
+      </div>
+      <p class="monitor-note">
+        Reads from a Logistic Regression pipeline (86.9% held-out accuracy, 96.2% ROC-AUC) served locally by FastAPI at 127.0.0.1:8000.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_URL = "http://127.0.0.1:8000/predict";
+
+const FIELDS = [
+  { name: "age", label: "Age", type: "number", placeholder: "48", defaultValue: 63 },
+  { name: "sex", label: "Sex", type: "select", options: [["1","Male"],["0","Female"]], defaultValue: "1" },
+  { name: "cp", label: "Chest pain type", type: "select", options: [["1","Typical angina"],["2","Atypical angina"],["3","Non-anginal pain"],["4","Asymptomatic"]], defaultValue: "1" },
+  { name: "trestbps", label: "Resting BP", type: "number", placeholder: "130", hint: "mm Hg", defaultValue: 145 },
+  { name: "chol", label: "Cholesterol", type: "number", placeholder: "200", hint: "mg/dl", defaultValue: 233 },
+  { name: "fbs", label: "Fasting sugar > 120", type: "select", options: [["1","Yes"],["0","No"]], defaultValue: "1" },
+  { name: "restecg", label: "Resting ECG", type: "select", options: [["0","Normal"],["1","ST-T abnormality"],["2","LV hypertrophy"]], defaultValue: "2" },
+  { name: "thalach", label: "Max heart rate", type: "number", placeholder: "150", defaultValue: 150 },
+  { name: "exang", label: "Exercise angina", type: "select", options: [["1","Yes"],["0","No"]], defaultValue: "0" },
+  { name: "oldpeak", label: "ST depression", type: "number", placeholder: "0.0", step: "0.1", defaultValue: 2.3 },
+  { name: "slope", label: "ST slope", type: "select", options: [["1","Upsloping"],["2","Flat"],["3","Downsloping"]], defaultValue: "3" },
+  { name: "ca", label: "Vessels colored", type: "select", options: [["0","0"],["1","1"],["2","2"],["3","3"]], defaultValue: "0" },
+  { name: "thal", label: "Thalassemia", type: "select", options: [["3","Normal"],["6","Fixed defect"],["7","Reversible defect"]], defaultValue: "6" },
+];
+
+function initForm() {
+  const fieldGrid = document.getElementById("fieldGrid");
+  fieldGrid.innerHTML = FIELDS.map(f => {
+    if (f.type === "select") {
+      const optionsHtml = f.options.map(([val, text]) => 
+        `<option value="${val}" ${val == f.defaultValue ? 'selected' : ''}>${text}</option>`
+      ).join('');
+      return `
+        <div class="field">
+          <label for="${f.name}">${f.label}</label>
+          <select id="${f.name}" name="${f.name}">
+            ${optionsHtml}
+          </select>
+          ${f.hint ? `<span class="hint">${f.hint}</span>` : ''}
+        </div>
+      `;
+    } else {
+      return `
+        <div class="field">
+          <label for="${f.name}">${f.label}</label>
+          <input
+            id="${f.name}"
+            name="${f.name}"
+            type="number"
+            step="${f.step || '1'}"
+            placeholder="${f.placeholder}"
+            value="${f.defaultValue}"
+            required
+          />
+          ${f.hint ? `<span class="hint">${f.hint}</span>` : ''}
+        </div>
+      `;
+    }
+  }).join('');
+}
+
+function updateMonitor(state, probability = null) {
+  const tracePath = document.getElementById("tracePath");
+  const statusLabel = document.getElementById("statusLabel");
+  const probNum = document.getElementById("probNum");
+
+  let d, stroke;
+  if (state === "idle") {
+    d = "M0,60 L400,60";
+    stroke = "var(--pulse)";
+    statusLabel.className = "status-label idle";
+    statusLabel.textContent = "Awaiting input";
+    probNum.textContent = "—";
+  } else {
+    const isDisease = state === "disease";
+    const spike = isDisease ? 46 : 22;
+    const width = isDisease ? 10 : 18;
+    let path = "M0,60 ";
+    for (let x = 0; x < 400; x += 80) {
+      path += `L${x+30},60 L${x+30+width*0.3},${60-spike} L${x+30+width*0.6},${60+spike*0.6} L${x+30+width},60 `;
+    }
+    d = path;
+    stroke = isDisease ? "var(--risk)" : "var(--pulse)";
+    statusLabel.className = `status-label ${state}`;
+    statusLabel.textContent = isDisease ? "Disease" : "Healthy";
+    probNum.textContent = (probability * 100).toFixed(1) + "%";
+  }
+
+  tracePath.setAttribute("d", d);
+  tracePath.setAttribute("stroke", stroke);
+}
+
+document.getElementById("predictionForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const submitBtn = document.getElementById("submitBtn");
+  const errorMsg = document.getElementById("errorMsg");
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Predicting…";
+  errorMsg.textContent = "";
+
+  try {
+    const payload = {};
+    for (const f of FIELDS) {
+      const val = document.getElementById(f.name).value;
+      payload[f.name] = f.type === "number" ? parseFloat(val) : parseInt(val, 10);
+    }
+
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.detail ? JSON.stringify(body.detail) : `Request failed (${res.status})`);
+    }
+
+    const data = await res.json();
+    const state = data.prediction === "Disease" ? "disease" : "healthy";
+    updateMonitor(state, data.disease_probability);
+
+  } catch (err) {
+    errorMsg.textContent = err.message || "Couldn't reach the API — is uvicorn running on port 8000?";
+    updateMonitor("idle");
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Run prediction";
+  }
+});
+
+// Initialize form inputs on page load
+initForm();
+</script>
+</body>
+</html>
