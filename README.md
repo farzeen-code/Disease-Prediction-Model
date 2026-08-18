@@ -2,6 +2,8 @@
 
 Predicting the presence of heart disease in a patient using classic clinical measurements, comparing three classification models.
 
+![Patient Risk Intake Dashboard](https://github.com/user-attachments/assets/5d8e89d9-bf0b-44f0-af3a-315c3c81cd2a)
+
 ## Objective
 
 Predict whether a patient has heart disease (binary: Healthy / Disease) from clinical measurements, and identify which measurements matter most.
